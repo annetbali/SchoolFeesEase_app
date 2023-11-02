@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:school_fees_ease/screens/login.dart';
 
-// onboarding screen
 class OnboardingScreenOne extends StatelessWidget {
   const OnboardingScreenOne({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue, // Set background color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("images/onboarding.png", height: 250,),
-            const Text("Buy with Dynapharm"),
-            ElevatedButton(onPressed: (){
-                 Navigator.push(context,MaterialPageRoute(
-                builder: (context) => const OnboardingScreenTwo()),);
-              }, child: const Text("Get started")), 
+            Image.asset("images/onboarding.png", height: 250),
+            const SizedBox(height: 20),
+            const Text(
+              "Discover a world of convenient payments and more!",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OnboardingScreenTwo(),
+                  ),
+                );
+              },
+              child: const Text(
+                "Get started",
+                style: TextStyle(color: Colors.blue),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -31,32 +55,59 @@ class OnboardingScreenTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue, // Set background color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("images/2.png", height: 250,),
-            const Text("Buy with Dynapharm"),
-            const SizedBox (height: 20), // Add spacing between the text and buttons
+            Image.asset("images/2.png", height: 250),
+            const SizedBox(height: 20),
+            const Text(
+              "Make payments and transactions with ease.",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => const OnboardingScreenOne(),
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OnboardingScreenOne(),
+                      ),
+                    );
                   },
                   child: const Text("Back"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                  ),
                 ),
-                const SizedBox (width: 20), // Add spacing between buttons
+                const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => const OnboardingScreenThree(),
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OnboardingScreenThree(),
+                      ),
+                    );
                   },
                   child: const Text("Next"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -67,39 +118,65 @@ class OnboardingScreenTwo extends StatelessWidget {
   }
 }
 
-
 class OnboardingScreenThree extends StatelessWidget {
   const OnboardingScreenThree({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue, // Set background color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("images/3.png", height: 250,),
-            const Text("Buy with Dynapharm"),
-            const SizedBox(height: 20), // Add spacing between the text and buttons
+            Image.asset("images/3.png", height: 250),
+            const SizedBox(height: 20),
+            const Text(
+              "Join us today and explore the future of payments!",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => const OnboardingScreenTwo(),
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OnboardingScreenTwo(),
+                      ),
+                    );
                   },
-                  child: const Text("Back", ),
+                  child: const Text("Back"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 20), // Add spacing between buttons
+                const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => LoginScreen(),
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Text("Done"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -1,45 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:school_fees_ease/screens/makepayment.dart';
+import 'package:school_fees_ease/screens/viewtransactions.dart';
 
-class HomePage extends StatefulWidget {
-  @override
-  _PaymentHomePageState createState() => _PaymentHomePageState();
-}
-
-class _PaymentHomePageState extends State<HomePage> {
-  double accountBalance = 1000.0; // Replace with the actual account balance
-
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Payment App'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Account Balance:',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              '\$$accountBalance',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              'Welcome to the Payment App',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
-                // Implement logic for making payments
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MakePaymentScreen(),
+                  ),
+                );
               },
-              child: Text('Make Payment'),
+              child: Text('Make a Payment'),
             ),
+            SizedBox(height: 10.0),
             ElevatedButton(
               onPressed: () {
-                // Implement logic for viewing transaction history
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewTransactionsScreen(),
+                  ),
+                );
               },
               child: Text('View Transactions'),
             ),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'User Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+              onTap: () {
+                // Implement navigation to the home page or close the drawer.
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.payment),
+              title: Text('Make a Payment'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MakePaymentScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.history),
+              title: Text('View Transactions'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewTransactionsScreen(),
+                  ),
+                );
+              },
+            ),
+            // Add more menu items as needed.
           ],
         ),
       ),
