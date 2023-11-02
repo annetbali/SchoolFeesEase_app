@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384638970506",
+    "project_id": "schoolfees-f5d0d",
+    "storage_bucket": "schoolfees-f5d0d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384638970506:android:fe7de375d6848a53801b73",
+        "android_client_info": {
+          "package_name": "com.fees.school_fees_ease"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1d_G5LgfDNEpnIZqG_M72yselAF_VDiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
