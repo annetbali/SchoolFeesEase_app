@@ -36,7 +36,7 @@ class OnboardingScreenOne extends StatelessWidget {
                 style: TextStyle(color: Colors.blue),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
+                primary: Colors.orange,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25.0),
                 ),
@@ -85,7 +85,7 @@ class OnboardingScreenTwo extends StatelessWidget {
                   },
                   child: const Text("Back"),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
+                    primary:  Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
@@ -103,7 +103,7 @@ class OnboardingScreenTwo extends StatelessWidget {
                   },
                   child: const Text("Next"),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
+                    primary:  Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
@@ -154,7 +154,7 @@ class OnboardingScreenThree extends StatelessWidget {
                   },
                   child: const Text("Back"),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
+                    primary:  Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
@@ -172,7 +172,7 @@ class OnboardingScreenThree extends StatelessWidget {
                   },
                   child: const Text("Done"),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
+                    primary:  Colors.orange,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0),
                     ),
