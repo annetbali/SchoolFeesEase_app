@@ -1,187 +1,143 @@
 import 'package:flutter/material.dart';
-import 'package:school_fees_ease/screens/login.dart';
+import 'authentication.dart'; // Import your AuthenticationScreen
 
-class OnboardingScreenOne extends StatelessWidget {
-  const OnboardingScreenOne({super.key});
+class OnboardingScreen extends StatefulWidget {
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  List<Map<String, String>> onboardingData = [
+    {
+      'title': 'Empowering Education',
+      'description':
+          'Unlock seamless school fee payments. Connect, manage, and pay for your children’s education effortlessly from anywhere',
+      'imagePath': 'assets/images/image1.png', // Replace with your image path
+    },
+    {
+      'title': 'Efficient Financial Management',
+      'description':
+          'Take control of finances. Securely handle school fees with intuitive payment tools and transparent transactions',
+      'imagePath': 'assets/images/image2.png', // Replace with your image path
+    },
+    {
+      'title': 'Global Connectivity',
+      'description':
+          'Bridging distances, connecting families. Experience global accessibility. Pay fees hassle-free, fostering education no matter the distance.',
+      'imagePath': 'assets/images/image3.png', // Replace with your image path
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue, // Set background color
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset("images/onboarding.png", height: 250),
-            const SizedBox(height: 20),
-            const Text(
-              "Discover a world of convenient payments and more!",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const OnboardingScreenTwo(),
-                  ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: onboardingData.length,
+              onPageChanged: (int page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
+              itemBuilder: (BuildContext context, int index) {
+                return OnboardingPage(
+                  title: onboardingData[index]['title']!,
+                  description: onboardingData[index]['description']!,
+                  imagePath: onboardingData[index]['imagePath']!,
+                  isLast: index == onboardingData.length - 1,
                 );
               },
-              child: const Text(
-                "Get started",
-                style: TextStyle(color: Colors.blue),
-              ),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.orange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-              ),
             ),
-          ],
-        ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  if (_currentPage > 0) {
+                    _pageController.previousPage(
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.ease,
+                    );
+                  }
+                },
+                child: Text('Previous'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_currentPage < onboardingData.length - 1) {
+                    _pageController.nextPage(
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.ease,
+                    );
+                  } else {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Authentication(),
+                      ),
+                    );
+                  }
+                },
+                child: Text(_currentPage == onboardingData.length - 1
+                    ? 'Get Started'
+                    : 'Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class OnboardingScreenTwo extends StatelessWidget {
-  const OnboardingScreenTwo({super.key});
+class OnboardingPage extends StatelessWidget {
+  final String title;
+  final String description;
+  final String imagePath;
+  final bool isLast;
+
+  const OnboardingPage({
+    required this.title,
+    required this.description,
+    required this.imagePath,
+    required this.isLast,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue, // Set background color
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset("images/2.png", height: 250),
-            const SizedBox(height: 20),
-            const Text(
-              "Make payments and transactions with ease.",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: 20),
+          Image.asset(
+            imagePath,
+            width: 300,
+            height: 300,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(height: 20),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OnboardingScreenOne(),
-                      ),
-                    );
-                  },
-                  child: const Text("Back"),
-                  style: ElevatedButton.styleFrom(
-                    primary:  Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OnboardingScreenThree(),
-                      ),
-                    );
-                  },
-                  child: const Text("Next"),
-                  style: ElevatedButton.styleFrom(
-                    primary:  Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class OnboardingScreenThree extends StatelessWidget {
-  const OnboardingScreenThree({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue, // Set background color
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset("images/3.png", height: 250),
-            const SizedBox(height: 20),
-            const Text(
-              "Join us today and explore the future of payments!",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OnboardingScreenTwo(),
-                      ),
-                    );
-                  },
-                  child: const Text("Back"),
-                  style: ElevatedButton.styleFrom(
-                    primary:  Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text("Done"),
-                  style: ElevatedButton.styleFrom(
-                    primary:  Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+          ),
+          if (isLast) SizedBox(height: 100), // Add extra space for last slide
+        ],
       ),
     );
   }

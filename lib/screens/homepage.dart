@@ -1,48 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:school_fees_ease/screens/makepayment.dart';
-import 'package:school_fees_ease/screens/viewtransactions.dart';
+import 'PayFeesPage.dart';
+import 'ViewReceiptsPage.dart';
+import 'FeeBreakdownPage.dart';
+
+
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment App'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Welcome to the Payment App',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MakePaymentScreen(),
-                  ),
-                );
-              },
-              child: Text('Make a Payment'),
-            ),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewTransactionsScreen(),
-                  ),
-                );
-              },
-              child: Text('View Transactions'),
-            ),
-          ],
-        ),
+        title: Text('School Fees Payment'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -53,46 +21,315 @@ class HomePage extends StatelessWidget {
                 color: Colors.blue,
               ),
               child: Text(
-                'User Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                'Drawer Header',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
+              title: Text('Item 1'),
               onTap: () {
-                // Implement navigation to the home page or close the drawer.
-                Navigator.pop(context);
+                // Handle item 1 press
               },
             ),
             ListTile(
-              leading: Icon(Icons.payment),
-              title: Text('Make a Payment'),
+              title: Text('Item 2'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MakePaymentScreen(),
-                  ),
-                );
+                // Handle item 2 press
               },
             ),
-            ListTile(
-              leading: Icon(Icons.history),
-              title: Text('View Transactions'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewTransactionsScreen(),
-                  ),
-                );
-              },
+          ],
+        ),
+      ),
+      body: GridView.count(
+        crossAxisCount: 2,
+        children: <Widget>[
+          CategoryCard(
+            title: 'Pay Fees',
+            icon: Icons.payment,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PayFeesPage()),
+              );
+            },
+          ),
+          CategoryCard(
+            title: 'View Receipts',
+            icon: Icons.receipt,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ViewReceiptsPage()),
+              );
+            },
+          ),
+          CategoryCard(
+            title: 'Fee Breakdown',
+            icon: Icons.list_alt,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FeeBreakdownPage()),
+              );
+            },
+          ),
+          CategoryCard(
+            title: 'Payment Methods',
+            icon: Icons.credit_card,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PaymentMethodsPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function onTap;
+
+  CategoryCard({required this.title, required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        onTap(); // This will navigate to the respective page when tapped
+      },
+      child: Card(
+        margin: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 50.0,
             ),
-            // Add more menu items as needed.
+            SizedBox(height: 5.0),
+            Text(
+              title,
+              style: TextStyle(fontSize: 20.0),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+// // Example pages for each category (replace with your actual pages)
+// class PayFeesPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Pay Fees'),
+//       ),
+//       body: Center(
+//         child: Text('Pay Fees Page'),
+//       ),
+//     );
+//   }
+// }
+
+// class ViewReceiptsPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('View Receipts'),
+//       ),
+//       body: Center(
+//         child: Text('View Receipts Page'),
+//       ),
+//     );
+//   }
+// }
+
+// class FeeBreakdownPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Fee Breakdown'),
+//       ),
+//       body: Center(
+//         child: Text('Fee Breakdown Page'),
+//       ),
+//     );
+//   }
+// }
+
+class PaymentMethodsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Payment Methods'),
+      ),
+      body: Center(
+        child: Text('Payment Methods Page'),
+      ),
+    );
+  }
+}
+
+// import 'package:flutter/material.dart';
+// import 'PayFeesPage.dart';
+
+
+// class HomePage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('School Fees Payment'),
+//       ),
+//       body: GridView.count(
+//         crossAxisCount: 2,
+//         children: <Widget>[
+//           CategoryCard(
+//             title: 'Pay Fees',
+//             icon: Icons.payment,
+//             onTap: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(builder: (context) => PayFeesPage()),
+//               );
+//             },
+//           ),
+//           CategoryCard(
+//             title: 'View Receipts',
+//             icon: Icons.receipt,
+//             onTap: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(builder: (context) => ViewReceiptsPage()),
+//               );
+//             },
+//           ),
+//           CategoryCard(
+//             title: 'Fee Breakdown',
+//             icon: Icons.list_alt,
+//             onTap: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(builder: (context) => FeeBreakdownPage()),
+//               );
+//             },
+//           ),
+//           CategoryCard(
+//             title: 'Payment Methods',
+//             icon: Icons.credit_card,
+//             onTap: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(builder: (context) => PaymentMethodsPage()),
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class CategoryCard extends StatelessWidget {
+//   final String title;
+//   final IconData icon;
+//   final Function onTap;
+
+//   CategoryCard({required this.title, required this.icon, required this.onTap});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         onTap();
+//       },
+//       child: Card(
+//         margin: EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: <Widget>[
+//             Icon(
+//               icon,
+//               size: 50.0,
+//             ),
+//             SizedBox(height: 5.0),
+//             Text(
+//               title,
+//               style: TextStyle(fontSize: 20.0),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// // Example pages for each category (replace with your actual pages)
+// class PayFeesPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Pay Fees'),
+//       ),
+//       body: Center(
+//         child: Text('Pay Fees Page'),
+//       ),
+//     );
+//   }
+// }
+
+// class ViewReceiptsPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('View Receipts'),
+//       ),
+//       body: Center(
+//         child: Text('View Receipts Page'),
+//       ),
+//     );
+//   }
+// }
+
+// class FeeBreakdownPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Fee Breakdown'),
+//       ),
+//       body: Center(
+//         child: Text('Fee Breakdown Page'),
+//       ),
+//     );
+//   }
+// }
+
+// class PaymentMethodsPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Payment Methods'),
+//       ),
+//       body: Center(
+//         child: Text('Payment Methods Page'),
+//       ),
+//     );
+//   }
+// }
