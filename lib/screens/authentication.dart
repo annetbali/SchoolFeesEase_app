@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'homepage.dart'; // Import your HomePage
 import 'signup.dart'; // Import your SignUpPage
+import 'password_recovery.dart';
 
-class LoginApp extends StatelessWidget {
+class Authentication extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login Page',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Authentication(),
-    );
-  }
+  _AuthenticationState createState() => _AuthenticationState();
 }
 
-class Authentication extends StatelessWidget {
+class _AuthenticationState extends State<Authentication> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isObscure = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,204 +22,109 @@ class Authentication extends StatelessWidget {
         title: Text('Login'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: LoginForm(),
-      ),
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  // You can add more validation if needed
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      // Toggle password visibility
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  ),
+                ),
+                obscureText: _isObscure,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  // You can add more validation if needed
+                  return null;
+                },
+              ),
+              SizedBox(height: 24.0),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    String? storedEmail = prefs.getString('email');
+                    String? storedPassword = prefs.getString('password');
+
+                    if (emailController.text == storedEmail &&
+                        passwordController.text == storedPassword) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Invalid email or password'),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Text('Log In'),
+              ),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () { Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PasswordRecoveryPage()),
     );
-  }
-}
-
-class LoginForm extends StatefulWidget {
-  @override
-  _LoginFormState createState() => _LoginFormState();
-}
-
-class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
-  late String _email;
-  late String _password;
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Email'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your email';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              _email = value!;
-            },
-          ),
-          SizedBox(height: 20),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Password'),
-            obscureText: true,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your password';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              _password = value!;
-            },
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                // Handle login logic here
-                // For now, simulate a successful login
-                // Replace this with your actual login logic
-                bool isLoginSuccessful = true; // Change to your actual logic
-
-                if (isLoginSuccessful) {
-                  // Navigate to the home page after successful login
-                  Navigator.pushReplacement(
+                  // Placeholder for "Forgot Password?" functionality
+                  // You can implement password recovery logic here
+                  // For instance, navigate to a password recovery page
+                },
+                child: Text('Forgot Password?'),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(builder: (context) => SignUpPage()),
                   );
-                // ignore: dead_code
-                } else {
-                  // Show an error message if login fails
-                }
-              }
-            },
-            child: Text('Login'),
+                },
+                child: Text('Sign Up'),
+              ),
+            ],
           ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              // Navigate to the sign-up page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SignUpPage()),
-              );
-            },
-            child: Text('Sign Up'),
-          ),
-        ],
+        ),
       ),
     );
   }
+  
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:school_fees_ease/screens/homepage.dart';
-// import 'signup.dart'; // Import your SignUpPage
-
-// class LoginApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Login Page',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//         visualDensity: VisualDensity.adaptivePlatformDensity,
-//       ),
-//       home: Authentication(),
-//     );
-//   }
-// }
-
-// class Authentication extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Login'),
-//       ),
-//       body: Padding(
-//         padding: EdgeInsets.all(16.0),
-//         child: LoginForm(),
-//       ),
-//     );
-//   }
-// }
-
-// class LoginForm extends StatefulWidget {
-//   @override
-//   _LoginFormState createState() => _LoginFormState();
-// }
-
-// class _LoginFormState extends State<LoginForm> {
-//   final _formKey = GlobalKey<FormState>();
-//   late String _email;
-//   late String _password;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Form(
-//       key: _formKey,
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: <Widget>[
-//           TextFormField(
-//             decoration: InputDecoration(labelText: 'Email'),
-//             validator: (value) {
-//               if (value == null || value.isEmpty) {
-//                 return 'Please enter your email';
-//               }
-//               return null;
-//             },
-//             onSaved: (value) {
-//               _email = value!;
-//             },
-//           ),
-//           SizedBox(height: 20),
-//           TextFormField(
-//             decoration: InputDecoration(labelText: 'Password'),
-//             obscureText: true,
-//             validator: (value) {
-//               if (value == null || value.isEmpty) {
-//                 return 'Please enter your password';
-//               }
-//               return null;
-//             },
-//             onSaved: (value) {
-//               _password = value!;
-//             },
-//           ),
-//           SizedBox(height: 20),
-//           ElevatedButton(
-//             onPressed: () {
-//               if (_formKey.currentState!.validate()) {
-//                 _formKey.currentState!.save();
-//                 // Handle login logic here
-//                 // For now, print the email and password
-//                 print('Email: $_email, Password: $_password');
-//               }
-//             },
-//             child: Text('Login'),
-//           ),
-//           SizedBox(height: 10),
-//           ElevatedButton(
-//             onPressed: () {
-//               // Navigate to the sign-up page
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(builder: (context) => SignUpPage()),
-//               );
-//                // Navigate to the home page after successful login
-//                       Navigator.pushReplacement(
-//                         context,
-//                         MaterialPageRoute(builder: (context) => HomePage()),
-//                       );
-//             },
-//             child: Text('Sign Up'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-

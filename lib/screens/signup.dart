@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_fees_ease/screens/authentication.dart';
 import 'package:school_fees_ease/screens/homepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +30,12 @@ class SignUpPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Sign Up'),
       ),
-      body: Padding(
+      
+        body: Container(
+        decoration: BoxDecoration(
+          color: Color.fromRGBO(8, 8, 0, 0.5), // Transparent white (adjust the alpha value as needed)
+        ),
+        child:Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -104,10 +110,25 @@ class SignUpPage extends StatelessWidget {
                 },
                 child: Text('Sign Up'),
               ),
+
+
+              SizedBox(
+                height: 20,
+              ),
+               ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Authentication()),
+                  );
+                },
+                child: Text('Already have an account?   \   Log In'),
+              ),
             ],
           ),
         ),
       ),
+    ),
     );
   }
 

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'authentication.dart'; // Import your AuthenticationScreen
+import 'signup.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  late AnimationController _controller;
+
   List<Map<String, String>> onboardingData = [
     {
       'title': 'Empowering Education',
@@ -31,6 +34,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
@@ -50,6 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   description: onboardingData[index]['description']!,
                   imagePath: onboardingData[index]['imagePath']!,
                   isLast: index == onboardingData.length - 1,
+                  controller: _controller,
                 );
               },
             ),
@@ -79,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Authentication(),
+                        builder: (context) => SignUpApp(),
                       ),
                     );
                   }
@@ -101,12 +120,14 @@ class OnboardingPage extends StatelessWidget {
   final String description;
   final String imagePath;
   final bool isLast;
+  final AnimationController controller;
 
   const OnboardingPage({
     required this.title,
     required this.description,
     required this.imagePath,
     required this.isLast,
+    required this.controller,
   });
 
   @override
@@ -117,11 +138,19 @@ class OnboardingPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           SizedBox(height: 20),
-          Image.asset(
-            imagePath,
-            width: 300,
-            height: 300,
-            fit: BoxFit.contain,
+          AnimatedBuilder(
+            animation: controller,
+            builder: (BuildContext context, Widget? child) {
+              return Transform.translate(
+                offset: Offset(controller.value * 200, 0),
+                child: Image.asset(
+                  imagePath,
+                  width: 300,
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
+              );
+            },
           ),
           SizedBox(height: 20),
           Text(
@@ -142,3 +171,148 @@ class OnboardingPage extends StatelessWidget {
     );
   }
 }
+
+// import 'package:flutter/material.dart';
+// import 'package:school_fees_ease/screens/signup.dart'; // Import your AuthenticationScreen
+
+// class OnboardingScreen extends StatefulWidget {
+//   @override
+//   _OnboardingScreenState createState() => _OnboardingScreenState();
+// }
+
+// class _OnboardingScreenState extends State<OnboardingScreen> {
+//   final PageController _pageController = PageController();
+//   int _currentPage = 0;
+//   List<Map<String, String>> onboardingData = [
+//     {
+//       'title': 'Empowering Education',
+//       'description':
+//           'Unlock seamless school fee payments. Connect, manage, and pay for your children’s education effortlessly from anywhere',
+//       'imagePath': 'assets/images/image1.png', // Replace with your image path
+//     },
+//     {
+//       'title': 'Efficient Financial Management',
+//       'description':
+//           'Take control of finances. Securely handle school fees with intuitive payment tools and transparent transactions',
+//       'imagePath': 'assets/images/image2.png', // Replace with your image path
+//     },
+//     {
+//       'title': 'Global Connectivity',
+//       'description':
+//           'Bridging distances, connecting families. Experience global accessibility. Pay fees hassle-free, fostering education no matter the distance.',
+//       'imagePath': 'assets/images/image3.png', // Replace with your image path
+//     },
+//   ];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Column(
+//         children: <Widget>[
+//           Expanded(
+//             child: PageView.builder(
+//               controller: _pageController,
+//               itemCount: onboardingData.length,
+//               onPageChanged: (int page) {
+//                 setState(() {
+//                   _currentPage = page;
+//                 });
+//               },
+//               itemBuilder: (BuildContext context, int index) {
+//                 return OnboardingPage(
+//                   title: onboardingData[index]['title']!,
+//                   description: onboardingData[index]['description']!,
+//                   imagePath: onboardingData[index]['imagePath']!,
+//                   isLast: index == onboardingData.length - 1,
+//                 );
+//               },
+//             ),
+//           ),
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//             children: <Widget>[
+//               ElevatedButton(
+//                 onPressed: () {
+//                   if (_currentPage > 0) {
+//                     _pageController.previousPage(
+//                       duration: Duration(milliseconds: 500),
+//                       curve: Curves.ease,
+//                     );
+//                   }
+//                 },
+//                 child: Text('Previous'),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   if (_currentPage < onboardingData.length - 1) {
+//                     _pageController.nextPage(
+//                       duration: Duration(milliseconds: 500),
+//                       curve: Curves.ease,
+//                     );
+//                   } else {
+//                     Navigator.pushReplacement(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (context) => SignUpApp(),
+//                       ),
+//                     );
+//                   }
+//                 },
+//                 child: Text(_currentPage == onboardingData.length - 1
+//                     ? 'Get Started'
+//                     : 'Next'),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class OnboardingPage extends StatelessWidget {
+//   final String title;
+//   final String description;
+//   final String imagePath;
+//   final bool isLast;
+
+//   const OnboardingPage({
+//     required this.title,
+//     required this.description,
+//     required this.imagePath,
+//     required this.isLast,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       padding: EdgeInsets.all(20.0),
+//       child: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: <Widget>[
+//           SizedBox(height: 20),
+//           Image.asset(
+//             imagePath,
+//             width: 300,
+//             height: 300,
+//             fit: BoxFit.contain,
+//           ),
+//           SizedBox(height: 20),
+//           Text(
+//             title,
+//             style: TextStyle(
+//               fontSize: 24,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           SizedBox(height: 20),
+//           Text(
+//             description,
+//             textAlign: TextAlign.center,
+//           ),
+//           if (isLast) SizedBox(height: 100), // Add extra space for last slide
+//         ],
+//       ),
+//     );
+//   }
+// }
