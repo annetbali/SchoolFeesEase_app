@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'homepage.dart'; // Import your HomePage
-import 'signup.dart'; // Import your SignUpPage
-import 'password_recovery.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_fees_ease/screens/widgets/app_button_widget.dart';
+import 'package:school_fees_ease/screens/widgets/text_field_widget.dart';
+import 'package:school_fees_ease/utils/colors.dart';
 
-class Authentication extends StatefulWidget {
+import '../Controllers/user_controller.dart';
+import '../core/state.dart';
+import '../utils/helpers.dart';
+import 'password_recovery.dart';
+import 'signup.dart'; // Import your SignUpPage
+
+class Authentication extends ConsumerStatefulWidget {
+  const Authentication({super.key});
+
   @override
   _AuthenticationState createState() => _AuthenticationState();
 }
 
-class _AuthenticationState extends State<Authentication> {
+class _AuthenticationState extends ConsumerState<Authentication> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -17,9 +25,23 @@ class _AuthenticationState extends State<Authentication> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
+        actions: [
+          userState.status == Status.loading
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(
+                        color: primaryColor,
+                      )),
+                )
+              : Container()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -27,40 +49,37 @@ class _AuthenticationState extends State<Authentication> {
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              TextFormField(
+              TextFieldWidget(
                 controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
+                prefixIcon: const Icon(Icons.email),
+                label: 'Email',
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
+                  if (!Helpers.emailValidator(value)) {
+                    return 'The Entered email is not valid';
+                  }
                   // You can add more validation if needed
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
-              TextFormField(
+              const SizedBox(height: 16.0),
+              TextFieldWidget(
                 controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      // Toggle password visibility
-                      setState(() {
-                        _isObscure = !_isObscure;
-                      });
-                    },
-                  ),
+                label: 'Password',
+                prefixIcon: const Icon(Icons.lock),
+                suffixIcon: InkWell(
+                  child: Icon(
+                      _isObscure ? Icons.visibility : Icons.visibility_off),
+                  onTap: () {
+                    // Toggle password visibility
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
                 ),
                 obscureText: _isObscure,
                 validator: (value) {
@@ -71,54 +90,45 @@ class _AuthenticationState extends State<Authentication> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.0),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    String? storedEmail = prefs.getString('email');
-                    String? storedPassword = prefs.getString('password');
-
-                    if (emailController.text == storedEmail &&
-                        passwordController.text == storedPassword) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Invalid email or password'),
-                        ),
-                      );
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.topRight,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PasswordRecoveryPage()),
+                    );
+                    // Placeholder for "Forgot Password?" functionality
+                    // You can implement password recovery logic here
+                    // For instance, navigate to a password recovery page
+                  },
+                  child: const Text('Forgot Password?'),
+                ),
+              ),
+              const SizedBox(height: 24.0),
+              AppButtonWidget(
+                  borderRadius: 15,
+                  onTap: () async {
+                    if (_formKey.currentState!.validate()) {
+                      ref.read(userProvider.notifier).login(
+                            emailController.text,
+                            passwordController.text,
+                          );
                     }
-                  }
-                },
-                child: Text('Log In'),
-              ),
-              SizedBox(height: 10),
-              TextButton(
-                onPressed: () { Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PasswordRecoveryPage()),
-    );
-                  // Placeholder for "Forgot Password?" functionality
-                  // You can implement password recovery logic here
-                  // For instance, navigate to a password recovery page
-                },
-                child: Text('Forgot Password?'),
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
+                  },
+                  child: const Text('Log In',
+                      style: TextStyle(color: whiteColor))),
+              const SizedBox(height: 30),
+              InkWell(
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()),
+                    MaterialPageRoute(builder: (context) => const SignUpPage()),
                   );
                 },
-                child: Text('Sign Up'),
+                child: const Text(' Go back to Sign Up?'),
               ),
             ],
           ),
@@ -126,5 +136,4 @@ class _AuthenticationState extends State<Authentication> {
       ),
     );
   }
-  
 }

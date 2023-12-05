@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+
+import '../utils/colors.dart';
 import 'signup.dart';
+import 'widgets/app_button_widget.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -38,7 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
   }
 
@@ -76,36 +81,48 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  if (_currentPage > 0) {
-                    _pageController.previousPage(
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.ease,
-                    );
-                  }
-                },
-                child: Text('Previous'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_currentPage < onboardingData.length - 1) {
-                    _pageController.nextPage(
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.ease,
-                    );
-                  } else {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignUpApp(),
-                      ),
-                    );
-                  }
-                },
-                child: Text(_currentPage == onboardingData.length - 1
-                    ? 'Get Started'
-                    : 'Next'),
+              if (_currentPage != 0)
+                Expanded(
+                  child: AppButtonWidget(
+                    color: darkGreyColor,
+                    onTap: () {
+                      if (_currentPage > 0) {
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.ease,
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Previous',
+                      style: TextStyle(color: whiteColor),
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: AppButtonWidget(
+                  onTap: () {
+                    if (_currentPage < onboardingData.length - 1) {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.ease,
+                      );
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpPage(),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    _currentPage == onboardingData.length - 1
+                        ? 'Get Started'
+                        : 'Next',
+                    style: const TextStyle(color: whiteColor),
+                  ),
+                ),
               ),
             ],
           ),
@@ -123,6 +140,7 @@ class OnboardingPage extends StatelessWidget {
   final AnimationController controller;
 
   const OnboardingPage({
+    super.key,
     required this.title,
     required this.description,
     required this.imagePath,
@@ -133,11 +151,11 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           AnimatedBuilder(
             animation: controller,
             builder: (BuildContext context, Widget? child) {
@@ -152,20 +170,22 @@ class OnboardingPage extends StatelessWidget {
               );
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             title,
-            style: TextStyle(
+            textAlign: TextAlign.center,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             description,
             textAlign: TextAlign.center,
           ),
-          if (isLast) SizedBox(height: 100), // Add extra space for last slide
+          if (isLast)
+            const SizedBox(height: 100), // Add extra space for last slide
         ],
       ),
     );

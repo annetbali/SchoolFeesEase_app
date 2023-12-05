@@ -20,6 +20,12 @@ dependencies:
   path_provider: ^2.1.1
   open_file: ^3.2.1
   flutter_local_notifications: ^9.1.6
+  dartz: ^0.10.1
+  fluttertoast: ^8.2.4
+  firebase_auth: ^4.15.0
+  cloud_firestore: ^4.13.3
+  firebase_core: ^2.24.0
+  flutter_riverpod: ^2.4.9
   # firebase_core: ^1.24.0
   # firebase_auth: ^3.11.2
   # cloud_firestore: ^3.3.0

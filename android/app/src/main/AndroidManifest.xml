@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="school_fees_ease"
+        android:label="School Fees easy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

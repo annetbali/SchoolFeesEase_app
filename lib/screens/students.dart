@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:school_fees_ease/utils/colors.dart';
 
-import '../Controllers/schools_controller.dart';
+import '../Controllers/Students_controller.dart';
 import '../core/state.dart';
-import '../models/school_model.dart';
+import '../models/Student_model.dart';
+import '../utils/colors.dart';
 import 'widgets/app_button_widget.dart';
 import 'widgets/text_field_widget.dart';
 
-class SchoolListPage extends ConsumerWidget {
-  const SchoolListPage({super.key});
+class StudentListPage extends ConsumerWidget {
+  const StudentListPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allSchoolsState = ref.watch(allSchoolsProvider);
-    final schoolCRUDState = ref.watch(schoolCRUDProvider);
-    ref.listen(schoolCRUDProvider, (previous, next) async {
+    final allStudentsState = ref.watch(allStudentsProvider);
+    final studentCRUDState = ref.watch(studentCRUDProvider);
+    ref.listen(studentCRUDProvider, (previous, next) async {
       if (next.status == Status.loaded) {
-        ref.invalidate(allSchoolsProvider);
+        ref.invalidate(allStudentsProvider);
       }
       if (next.status == Status.error) {
         Fluttertoast.cancel();
@@ -28,10 +28,10 @@ class SchoolListPage extends ConsumerWidget {
     });
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Schools in Uganda'),
+        title: const Text('Students'),
         actions: [
-          allSchoolsState.status == Status.loading ||
-                  schoolCRUDState.status == Status.loading
+          allStudentsState.status == Status.loading ||
+                  studentCRUDState.status == Status.loading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -48,31 +48,31 @@ class SchoolListPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: primaryColor,
           onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const AddSchoolPage()));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const AddStudentPage()));
           },
-          label: const Text('Add School', style: TextStyle(color: whiteColor)),
+          label: const Text('Add Student', style: TextStyle(color: whiteColor)),
           icon: const Icon(Icons.add, color: whiteColor)),
       body: ListView.builder(
-        itemCount: allSchoolsState.data!.length,
+        itemCount: allStudentsState.data!.length,
         itemBuilder: (context, index) {
-          final school = allSchoolsState.data![index];
+          final student = allStudentsState.data![index];
           return ListTile(
             trailing: IconButton(
                 onPressed: () {
                   ref
-                      .read(schoolCRUDProvider.notifier)
-                      .deleteSchool(id: school.id);
+                      .read(studentCRUDProvider.notifier)
+                      .deleteStudent(id: student.id);
                 },
                 icon: const Icon(Icons.delete, color: Colors.red)),
-            title: Text(school.name),
-            subtitle: Text(school.address, maxLines: 1),
+            title: Text(student.name),
+            subtitle: Text(student.address, maxLines: 1),
             onTap: () {
               // Navigate to a new page showing account details
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SchoolDetailsPage(school: school),
+                  builder: (context) => StudentDetailsPage(student: student),
                 ),
               );
             },
@@ -83,27 +83,27 @@ class SchoolListPage extends ConsumerWidget {
   }
 }
 
-class SchoolDetailsPage extends StatelessWidget {
-  final SchoolModel school;
+class StudentDetailsPage extends StatelessWidget {
+  final StudentModel student;
 
-  const SchoolDetailsPage({super.key, required this.school});
+  const StudentDetailsPage({super.key, required this.student});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(school.name),
+        title: Text(student.name),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bank: ${school.bankName}'),
+            Text('Level: ${student.level}'),
             const SizedBox(height: 10),
-            Text('Account Number: ${school.accountNumber}'),
+            Text('Student Number ${student.id}'),
             const SizedBox(height: 10),
-            Text('Address: ${school.address}'),
+            Text('Address: ${student.address}'),
           ],
         ),
       ),
@@ -111,15 +111,15 @@ class SchoolDetailsPage extends StatelessWidget {
   }
 }
 
-class AddSchoolPage extends ConsumerStatefulWidget {
-  const AddSchoolPage({super.key});
+class AddStudentPage extends ConsumerStatefulWidget {
+  const AddStudentPage({super.key});
 
   @override
-  ConsumerState<AddSchoolPage> createState() => _AddSchoolPageState();
+  ConsumerState<AddStudentPage> createState() => _AddStudentPageState();
 }
 
-class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
-  final TextEditingController bankNameController = TextEditingController();
+class _AddStudentPageState extends ConsumerState<AddStudentPage> {
+  final TextEditingController classController = TextEditingController();
 
   final TextEditingController bankAccountNumberController =
       TextEditingController();
@@ -132,7 +132,7 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    bankNameController.dispose();
+    classController.dispose();
     bankAccountNumberController.dispose();
     nameController.dispose();
     addressController.dispose();
@@ -144,13 +144,13 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
 
   @override
   Widget build(BuildContext context) {
-    final schoolCRUDState = ref.watch(schoolCRUDProvider);
+    final studentCRUDState = ref.watch(studentCRUDProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add School'),
+        title: const Text('Add Student'),
         actions: [
-          schoolCRUDState.status == Status.loading
+          studentCRUDState.status == Status.loading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -180,10 +180,10 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
                 children: <Widget>[
                   TextFieldWidget(
                     controller: nameController,
-                    label: 'Name',
+                    label: 'Student Name',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please school name';
+                        return 'Please Student name';
                       }
                       return null;
                     },
@@ -192,7 +192,7 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
                   const SizedBox(height: 16.0),
                   TextFieldWidget(
                     controller: addressController,
-                    label: 'Address',
+                    label: 'Student Address',
                     prefixIcon: const Icon(Icons.location_city),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -203,24 +203,12 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
                   ),
                   const SizedBox(height: 16.0),
                   TextFieldWidget(
-                    controller: bankNameController,
-                    label: 'Bank Name',
+                    controller: classController,
+                    label: 'Student Class',
                     prefixIcon: const Icon(Icons.account_balance_sharp),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter bank name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextFieldWidget(
-                    controller: bankAccountNumberController,
-                    label: 'bank Account Number',
-                    prefixIcon: const Icon(Icons.money_rounded),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter back account name';
+                        return 'Please enter student class';
                       }
                       return null;
                     },
@@ -228,25 +216,25 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
                   const SizedBox(height: 24.0),
                   AppButtonWidget(
                       borderRadius: 15,
-                      onTap: schoolCRUDState.status == Status.loading
+                      onTap: studentCRUDState.status == Status.loading
                           ? null
                           : () {
                               if (_formKey.currentState!.validate()) {
                                 // signUp(
-                                //   bankNameController.text,
+                                //   classController.text,
                                 //   bankAccountNumberController.text,
                                 //   nameController.text,
                                 //   addressController.text,
                                 // );
-                                ref.read(schoolCRUDProvider.notifier).addSchool(
-                                    name: nameController.text,
-                                    address: addressController.text,
-                                    bankName: bankNameController.text,
-                                    accountNumber:
-                                        bankAccountNumberController.text);
+                                ref
+                                    .read(studentCRUDProvider.notifier)
+                                    .addStudent(
+                                        name: nameController.text,
+                                        address: addressController.text,
+                                        level: classController.text);
                               }
                             },
-                      child: const Text('Add School',
+                      child: const Text('Add Student',
                           style: TextStyle(color: whiteColor))),
                   const SizedBox(
                     height: 20,
