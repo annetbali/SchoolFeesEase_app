@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_fees_ease/core/state.dart';
+import 'package:school_fees_ease/utils/colors.dart';
 
 import '../Controllers/schools_controller.dart';
+import '../Controllers/students_controller.dart';
 import 'widgets/text_field_widget.dart';
 
 class PayFeesPage extends ConsumerStatefulWidget {
@@ -181,6 +184,7 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
   @override
   Widget build(BuildContext context) {
     final allSchoolsState = ref.watch(allSchoolsProvider);
+    final getStudentState = ref.watch(getStudentProvider);
     var children2 = [
       DropDownWidget<String>(
           value: selectedSchool,
@@ -211,13 +215,27 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       ElevatedButton(
         onPressed: () {
           String studentNumber = studentNumberController.text;
-          fetchStudentDetails(studentNumber);
+          ref.read(getStudentProvider.notifier).getStudent(studentNumber);
+          // fetchStudentDetails(studentNumber);
         },
         child: const Text('Get Student Details'),
       ),
       const SizedBox(height: 20),
-      Text('Student Name: $studentName'),
-      Text('Student Class: $studentClass'),
+      switch (getStudentState.status) {
+        Status.initial => Container(),
+        Status.loading => const CircularProgressIndicator(color: primaryColor),
+        Status.loaded => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Student Name: ${getStudentState.data!.name}'),
+              Text('Student Class: ${getStudentState.data!.level}')
+            ],
+          ),
+        Status.error => Text(
+            getStudentState.message!,
+            style: const TextStyle(color: Colors.red),
+          ),
+      },
       const SizedBox(height: 20),
       TextFieldWidget(
         controller: amountController,

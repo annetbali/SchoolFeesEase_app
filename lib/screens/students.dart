@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:school_fees_ease/utils/helpers.dart';
 
 import '../Controllers/Students_controller.dart';
 import '../core/state.dart';
@@ -101,7 +102,15 @@ class StudentDetailsPage extends StatelessWidget {
           children: [
             Text('Level: ${student.level}'),
             const SizedBox(height: 10),
-            Text('Student Number ${student.id}'),
+            Row(
+              children: [
+                Expanded(child: Text('Student Number ${student.id}')),
+                // const Spacer(),
+                InkWell(
+                    onTap: () => Helpers.copyToClipboard(context, student.id),
+                    child: const Icon(Icons.copy))
+              ],
+            ),
             const SizedBox(height: 10),
             Text('Address: ${student.address}'),
           ],

@@ -38,12 +38,9 @@ class StudentsService {
   }
 
   static Future<Either<String, StudentModel>> getStudent(
-      {required String name,
-      required String address,
-      required String level}) async {
+      {required String id}) async {
     try {
-      var docId = DateTime.now().millisecondsSinceEpoch.toString();
-      var response = await fireStore.collection('Students').doc(docId).get();
+      var response = await fireStore.collection('Students').doc(id).get();
       if (response.data() != null) {
         return Right(StudentModel.fromMap(response.data()!));
       }
