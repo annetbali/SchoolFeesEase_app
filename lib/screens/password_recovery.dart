@@ -1,14 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:school_fees_ease/screens/widgets/app_button_widget.dart';
+import 'package:school_fees_ease/utils/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PasswordRecoveryPage extends StatelessWidget {
+import '../Controllers/user_controller.dart';
+import '../core/state.dart';
+import 'widgets/text_field_widget.dart';
+
+class PasswordRecoveryPage extends ConsumerStatefulWidget {
+  const PasswordRecoveryPage({super.key});
+
+  @override
+  ConsumerState<PasswordRecoveryPage> createState() =>
+      _PasswordRecoveryPageState();
+}
+
+class _PasswordRecoveryPageState extends ConsumerState<PasswordRecoveryPage> {
   final TextEditingController emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(passwordRecoveryProvider);
+    ref.listen(passwordRecoveryProvider, (previous, next) {
+      if (next.status == Status.loaded) {
+        Navigator.of(context).pop();
+        Fluttertoast.showToast(
+            msg: next.data ?? 'Recovery email sent successfully!!!',
+            timeInSecForIosWeb: 6);
+      }
+      if (next.status == Status.error) {
+        Fluttertoast.showToast(
+            msg: next.message ?? 'An error occurred !', timeInSecForIosWeb: 6);
+      }
+    });
     return Scaffold(
       appBar: AppBar(
-        title: Text('Password Recovery'),
+        title: const Text('Password Recovery'),
+        actions: [
+          userState.status == Status.loading
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                  ),
+                )
+              : Container()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -16,13 +59,10 @@ class PasswordRecoveryPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            TextFormField(
+            TextFieldWidget(
               controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
-              ),
+              prefixIcon: const Icon(Icons.email),
+              label: 'Email',
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -32,27 +72,20 @@ class PasswordRecoveryPage extends StatelessWidget {
                 return null;
               },
             ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () async {
-                if (emailController.text.isNotEmpty) {
-                  bool resetSuccessful = await resetPassword(emailController.text);
-                  if (resetSuccessful) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Password reset email sent!'),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Password reset failed. Invalid email!'),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text('Reset Password'),
+            const SizedBox(height: 16.0),
+            AppButtonWidget(
+              borderRadius: 15,
+              onTap: userState.status == Status.loading
+                  ? null
+                  : () async {
+                      if (emailController.text.isNotEmpty) {
+                        ref
+                            .watch(passwordRecoveryProvider.notifier)
+                            .login(emailController.text.trim());
+                      }
+                    },
+              child: const Text('Reset Password',
+                  style: TextStyle(color: whiteColor)),
             ),
           ],
         ),

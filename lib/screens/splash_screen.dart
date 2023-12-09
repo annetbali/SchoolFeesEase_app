@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_fees_ease/Controllers/user_controller.dart';
+import 'package:school_fees_ease/main.dart';
 
 import 'onboarding_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   AnimationController? _animationController;
   Animation<Offset>? _offsetAnimation;
@@ -29,15 +32,23 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _animationController!,
       curve: Curves.easeInOut,
     ));
-    navigateToNextScreen();
+    getUser();
   }
 
   void navigateToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 6));
+    await Future.delayed(const Duration(seconds: 4));
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => OnboardingScreen()),
     );
+  }
+
+  getUser() async {
+    if (auth.currentUser?.uid != null) {
+      Future(() => ref.read(userProvider.notifier).getUserData(context));
+    } else {
+      navigateToNextScreen();
+    }
   }
 
   @override
@@ -48,6 +59,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(userProvider);
+
     return Scaffold(
       body: Center(
         child: Padding(

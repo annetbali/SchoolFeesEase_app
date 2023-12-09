@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:school_fees_ease/Controllers/user_controller.dart';
+import 'package:school_fees_ease/main.dart';
 import 'package:school_fees_ease/screens/help_page.dart';
+import 'package:school_fees_ease/screens/splash_screen.dart';
 
 import 'FeeBreakdownPage.dart';
 import 'PayFeesPage.dart';
 import 'PaymentMethodsPage.dart';
 import 'ViewReceiptsPage.dart';
-import 'account.dart';
 import 'schools.dart';
 import 'students.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   String notificationMessage = '';
 
   bool _showCloseButton = false;
@@ -52,9 +55,9 @@ class _HomePageState extends State<HomePage> {
                         height: 80, // Adjust height as needed
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'school_fees_ease',
-                        style: TextStyle(
+                      Text(
+                        ref.watch(userProvider).data!.name.toUpperCase(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                         ),
@@ -62,9 +65,13 @@ class _HomePageState extends State<HomePage> {
                     ])),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home Page'),
-              onTap: () {
+              title: const Text(
+                'Home Page',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
                 //Navigate to the home page
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -73,27 +80,30 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Account'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const UserAccountPage(
-                      userName: 'christine', // Replace with actual user data
-                      userEmail:
-                          'christinenalubwama4@gmail.com', // Replace with actual user data
-                    ),
-                  ),
-                );
-                // Navigate to the account page
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.person),
+            //   title: const Text('Account'),
+            //   onTap: () {
+            //     Navigator.pop(context); // Close the drawer
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => const UserAccountPage(
+            //           userName: 'christine', // Replace with actual user data
+            //           userEmail:
+            //               'christinenalubwama4@gmail.com', // Replace with actual user data
+            //         ),
+            //       ),
+            //     );
+            //     // Navigate to the account page
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.school),
-              title: const Text('Schools'),
+              title: const Text(
+                'Schools',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 Navigator.push(
@@ -107,7 +117,10 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.school),
-              title: const Text('Students'),
+              title: const Text(
+                'Students',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 Navigator.push(
@@ -121,7 +134,10 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.help),
-              title: const Text('Help'),
+              title: const Text(
+                'Help',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               onTap: () {
                 // Navigate to the help page
                 Navigator.push(
@@ -133,10 +149,22 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.feedback),
-              title: const Text('Feed'),
-              onTap: () {
+              leading: const Icon(Icons.power_settings_new_rounded,
+                  color: Colors.red),
+              title: const Text(
+                'Logout',
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                await auth.signOut();
                 // Navigate to the feed page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SplashScreen(),
+                  ),
+                );
               },
             ),
           ],
@@ -144,49 +172,50 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          Container(
-            color: Colors.blue, // Replace with your preferred color
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      notificationMessage,
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 18.0),
-                      overflow: TextOverflow.ellipsis,
+          if (_showCloseButton)
+            Container(
+              color: Colors.blue, // Replace with your preferred color
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        notificationMessage,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 18.0),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
-                ),
-                _showCloseButton
-                    ? IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          _hideNotification();
-                        },
-                      )
-                    : const SizedBox(),
-              ],
+                  _showCloseButton
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            _hideNotification();
+                          },
+                        )
+                      : const SizedBox(),
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
               children: <Widget>[
                 _buildCategoryCard(
-                    'Pay Fees', Icons.payment, const PayFeesPage()),
+                    'Pay \nFees', Icons.payment, const PayFeesPage()),
                 _buildCategoryCard(
-                    'View Receipts', Icons.receipt, ViewReceiptsPage()),
+                    'View \nReceipts', Icons.receipt, const ViewReceiptsPage()),
                 _buildCategoryCard(
-                    'Fee Breakdown', Icons.list_alt, FeeBreakdownPage()),
-                _buildCategoryCard(
-                    'Payment Methods', Icons.credit_card, PaymentMethodsPage()),
+                    'Fee \nBreakdown', Icons.list_alt, FeeBreakdownPage()),
+                _buildCategoryCard('Payment \nMethods', Icons.credit_card,
+                    PaymentMethodsPage()),
               ],
             ),
           ),
@@ -208,19 +237,26 @@ class _HomePageState extends State<HomePage> {
         color: _showCloseButton
             ? Colors.lightBlue[200]
             : Colors.white, // Alternate colors
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              icon,
-              size: 50.0,
-            ),
-            const SizedBox(height: 5.0),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 20.0),
-            ),
-          ],
+        surfaceTintColor: _showCloseButton
+            ? Colors.lightBlue[200]
+            : Colors.white, // Alternate colors
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                icon,
+                size: 50.0,
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 20.0),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -32,7 +32,7 @@ class _GetStudentNotifier extends StateNotifier<AppState<StudentModel>> {
   getStudent(String id) async {
     state = state.copyWith(status: Status.loading);
     var data = await StudentsService.getStudent(id: id);
-    data.fold((l) => state = state.copyWith(status: Status.error, message: l),
+    data.fold((l) => state = AppState(status: Status.error, message: l),
         (r) => state = state.copyWith(status: Status.loaded, data: r));
   }
 }

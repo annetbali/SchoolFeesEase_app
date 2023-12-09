@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:school_fees_ease/core/state.dart';
+import 'package:school_fees_ease/models/payment_model.dart';
+import 'package:school_fees_ease/screens/widgets/app_button_widget.dart';
 import 'package:school_fees_ease/utils/colors.dart';
 
+import '../Controllers/payments_controller.dart';
 import '../Controllers/schools_controller.dart';
 import '../Controllers/students_controller.dart';
+import '../models/school_model.dart';
 import 'widgets/text_field_widget.dart';
 
 class PayFeesPage extends ConsumerStatefulWidget {
@@ -30,24 +35,7 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
     'Bank Transfer (Different Banks)',
   ];
 
-  selectedMobileMoneyProvider() => null;
-
-  // Function to simulate fetching student details based on entered student number
-  void fetchStudentDetails(String studentNumber) {
-    // Simulate fetching student details...
-    // Replace this with actual logic to fetch student details from a database or API
-    if (studentNumber == '12345') {
-      setState(() {
-        studentName = 'Jane Smith'; // Sample student name
-        studentClass = 'Class XI'; // Sample student class
-      });
-    } else {
-      setState(() {
-        studentName = 'Student not found';
-        studentClass = 'N/A';
-      });
-    }
-  }
+  String? selectedMobileMoneyProvider;
 
   void processPayment() {
     String amount = amountController.text;
@@ -177,35 +165,60 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
     super.dispose();
   }
 
-  var mobileMoneyProviders;
-  String? selectedBank;
-  var banks;
+  SchoolModel? schoolModel;
 
+  var mobileMoneyProviders = ['MTN', 'AIRTEL'];
+  String? selectedBank;
+  var banks = ['Centenary Bank', 'Equity', 'Post Bank'];
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final allSchoolsState = ref.watch(allSchoolsProvider);
     final getStudentState = ref.watch(getStudentProvider);
+    final paymentCRUDState = ref.watch(paymentCRUDProvider);
+    ref.listen(paymentCRUDProvider, (previous, next) async {
+      if (next.status == Status.loaded) {
+        ref.invalidate(allPaymentsProvider);
+      }
+      if (next.status == Status.error) {
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: next.message ?? 'An error occurred !', timeInSecForIosWeb: 6);
+      }
+    });
     var children2 = [
-      DropDownWidget<String>(
-          value: selectedSchool,
-          onChanged: (String? value) {
+      DropDownWidget<SchoolModel>(
+          value: schoolModel,
+          validator: (value) {
+            if (value == null) {
+              return 'Select School to continue';
+            }
+            return null;
+          },
+          onChanged: (SchoolModel? value) {
             setState(() {
-              selectedSchool = value!;
+              schoolModel = value!;
             });
           },
           items: [
-            const DropdownMenuItem<String>(
+            const DropdownMenuItem(
               child: Text('Select School'),
             ),
             ...allSchoolsState.data!.map((school) {
-              return DropdownMenuItem<String>(
-                value: school.id,
+              return DropdownMenuItem(
+                value: school,
                 child: Text(school.name),
               );
             }).toList()
           ]),
       const SizedBox(height: 20),
       TextFieldWidget(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Enter student number here';
+          }
+          return null;
+        },
         controller: studentNumberController,
         keyboardType: TextInputType.number,
         label: 'Student Number',
@@ -223,7 +236,8 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       const SizedBox(height: 20),
       switch (getStudentState.status) {
         Status.initial => Container(),
-        Status.loading => const CircularProgressIndicator(color: primaryColor),
+        Status.loading => const CircularProgressIndicator(
+            color: primaryColor, strokeWidth: 1.5),
         Status.loaded => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -238,6 +252,12 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       },
       const SizedBox(height: 20),
       TextFieldWidget(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Enter amount to be paid';
+          }
+          return null;
+        },
         controller: amountController,
         keyboardType: TextInputType.number,
         label: 'Amount',
@@ -258,6 +278,12 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
             // Reset selected bank or mobile money provider when payment method changes
           });
         },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Select payment method';
+          }
+          return null;
+        },
         items: paymentMethods.map((String method) {
           return DropdownMenuItem<String>(
             value: method,
@@ -269,8 +295,14 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       const SizedBox(height: 20),
       if (selectedPaymentMethod == 'Mobile Money')
         DropDownWidget<String>(
-          value: selectedMobileMoneyProvider(),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Select mobile money provider';
+            }
+            return null;
+          },
           onChanged: (String? value) {
+            selectedMobileMoneyProvider = value;
             setState(() {});
           },
           items: mobileMoneyProviders.map((String provider) {
@@ -283,11 +315,16 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
         ),
       if (selectedPaymentMethod == 'Bank Transfer (Different Banks)')
         DropDownWidget<String>(
-          value: selectedBank,
           onChanged: (String? value) {
             setState(() {
-              selectedBank = value!;
+              selectedMobileMoneyProvider = value!;
             });
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Select bank';
+            }
+            return null;
           },
           items: banks.map((String bank) {
             return DropdownMenuItem<String>(
@@ -316,21 +353,63 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       //   ),
       // ),
       const SizedBox(height: 20),
-      ElevatedButton(
-        onPressed: processPayment,
-        child: const Text('Make Payment'),
-      ),
+      AppButtonWidget(
+          borderRadius: 15,
+          onTap: paymentCRUDState.status == Status.loading
+              ? null
+              : () async {
+                  if (_formKey.currentState!.validate()) {
+                    if (getStudentState.data == null) {
+                      await Fluttertoast.cancel();
+                      Fluttertoast.showToast(msg: 'No student found');
+                      return;
+                    }
+                    ref.read(paymentCRUDProvider.notifier).addPayment(
+                        PaymentModel(
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            amount: amountController.text,
+                            paymentMethod: selectedPaymentMethod,
+                            purpose: purposeController.text,
+                            paymentProvider: selectedMobileMoneyProvider!,
+                            school: schoolModel!,
+                            student: getStudentState.data!,
+                            createdAt: DateTime.now(),
+                            updatedAt: DateTime.now()));
+                    // processPayment();
+                  }
+                },
+          child: const Text('Make Payment',
+              style: TextStyle(color: whiteColor, fontWeight: FontWeight.bold)))
     ];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pay Fees'),
+        actions: [
+          paymentCRUDState.status == Status.loading
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                  ),
+                )
+              : Container()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children2,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children2,
+            ),
           ),
         ),
       ),

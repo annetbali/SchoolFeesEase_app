@@ -27,6 +27,37 @@ class UserService {
     }
   }
 
+  static Future<Either<String, String>> passwordRecovery(String email) async {
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      return const Right('Password recovery email sent successfully!!!');
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? e.toString());
+    } on FirebaseException catch (e) {
+      return Left(e.message ?? e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  static Future<Either<String, UserModel>> getUserData() async {
+    try {
+      var userData =
+          await fireStore.collection('Users').doc(auth.currentUser?.uid).get();
+      if (userData.data() != null) {
+        return Right(UserModel.fromMap(userData.data()!));
+      } else {
+        return const Left('user not found');
+      }
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? e.toString());
+    } on FirebaseException catch (e) {
+      return Left(e.message ?? e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
   static Future<Either<String, UserModel>> register(
       {required String email,
       required String password,
