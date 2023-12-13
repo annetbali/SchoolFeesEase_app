@@ -6,7 +6,7 @@ import 'package:school_fees_ease/screens/authentication.dart';
 import 'package:school_fees_ease/screens/homepage.dart';
 import 'package:school_fees_ease/screens/widgets/app_button_widget.dart';
 import 'package:school_fees_ease/utils/colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/state.dart';
 import '../utils/helpers.dart';

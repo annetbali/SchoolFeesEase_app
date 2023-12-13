@@ -84,6 +84,7 @@ class ViewReceiptsPage extends ConsumerWidget {
               Text('Payment Method: ${receipt.paymentMethod}'),
               Text('Payment Provider: ${receipt.paymentProvider}'),
               Text('Student Name: ${receipt.student.name}'),
+              Text('School Name: ${receipt.school.name}'),
               Text('Student Class: ${receipt.student.level}'),
               // Add more receipt details as needed
             ],

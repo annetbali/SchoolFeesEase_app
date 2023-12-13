@@ -22,21 +22,6 @@ class _AllStudentsNotifier extends StateNotifier<AppState<List<PaymentModel>>> {
   }
 }
 
-// final getStudentProvider =
-//     StateNotifierProvider<_GetStudentNotifier, AppState<PaymentModel>>((ref) {
-//   return _GetStudentNotifier();
-// });
-
-// class _GetStudentNotifier extends StateNotifier<AppState<PaymentModel>> {
-//   _GetStudentNotifier() : super(AppState(status: Status.initial));
-//   getStudent(String id) async {
-//     state = state.copyWith(status: Status.loading);
-//     var data = await PaymentService.getPayments(id: id);
-//     data.fold((l) => state = AppState(status: Status.error, message: l),
-//         (r) => state = state.copyWith(status: Status.loaded, data: r));
-//   }
-// }
-
 final paymentCRUDProvider =
     StateNotifierProvider<_StudentCRUDNotifier, AppState<String>>((ref) {
   return _StudentCRUDNotifier();

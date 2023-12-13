@@ -10,7 +10,7 @@ class StudentModel {
     required this.id,
     required this.name,
     required this.address,
-    required this.level,
+    required this.level, 
   });
 
   StudentModel copyWith({

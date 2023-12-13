@@ -28,6 +28,7 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
   String? selectedSchool; // Default school
   String studentName = 'John Doe'; // Placeholder student name
   String studentClass = 'Class X'; // Placeholder student class
+  String schoolName = 'Class X'; // Placeholder school name
 
   List<String> paymentMethods = [
     'Credit Card',
@@ -91,13 +92,15 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
               const SizedBox(height: 10),
               Text('Student Name: $studentName'),
               Text('Student Class: $studentClass'),
+              Text('School Name: $schoolName'),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-              },
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+              _navigateToViewReceipt(context); // Navigate after 3 seconds
+            },
               child: const Text('Close'),
             ),
           ],
@@ -105,57 +108,11 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
       },
     );
   }
-
-  // void processPayment() {
-  //   String amount = amountController.text;
-  //   String purpose = purposeController.text;
-  //   String paymentMethod = selectedPaymentMethod;
-
-  //   // Payment processing logic...
-  //   // ...if (paymentMethod == 'Credit Card') {
-  //   // Placeholder for credit card payment processing
-  //   print('Processing payment with Credit Card...');
-  //   // Integrate with the payment gateway SDK/API here
-  // } else if (paymentMethod == 'Mobile Money') {
-  //   // Placeholder for mobile money payment processing
-  //   print('Processing payment with Mobile Money...');
-  //   // Integrate with the mobile money provider's API here
-  // } else if (paymentMethod == 'Bank Transfer (Different Banks)') {
-  //   // Placeholder for bank transfer payment processing
-  //   print('Processing payment with Bank Transfer...');
-  //   // Integrate with the bank's API here
-  // }
-
-  //   // Simulate success message
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Payment Successful'),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             Text('Amount: $amount'),
-  //             Text('Purpose: $purpose'),
-  //             Text('Payment Method: $paymentMethod'),
-  //             SizedBox(height: 10),
-  //             Text('Student Name: $studentName'),
-  //             Text('Student Class: $studentClass'),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(context); // Close the dialog
-  //             },
-  //             child: Text('Close'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+void _navigateToViewReceipt(BuildContext context) {
+  Future.delayed(const Duration(seconds: 3), () {
+    Navigator.pushReplacementNamed(context, '/view_receipt_page'); // Replace with your view receipt page route
+  });
+}
 
   @override
   void dispose() {
@@ -334,24 +291,6 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
           }).toList(),
           label: 'Select Bank',
         ),
-
-      //   value: selectedPaymentMethod,
-      //   onChanged: (String? value) {
-      //     setState(() {
-      //       selectedPaymentMethod = value!;
-      //     });
-      //   },
-      //   items: paymentMethods.map((String method) {
-      //     return DropdownMenuItem<String>(
-      //       value: method,
-      //       child: Text(method),
-      //     );
-      //   }).toList(),
-      //   decoration: InputDecoration(
-      //     labelText: 'Payment Method',
-      //     border: OutlineInputBorder(),
-      //   ),
-      // ),
       const SizedBox(height: 20),
       AppButtonWidget(
           borderRadius: 15,
@@ -377,7 +316,23 @@ class _PayFeesPageState extends ConsumerState<PayFeesPage> {
                             student: getStudentState.data!,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now()));
-                    // processPayment();
+                    setState(() {
+          // Clearing input fields after successful payment
+          amountController.clear();
+          purposeController.clear();
+          studentNumberController.clear();
+          // Displaying a success message
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Processing Payment...'),
+                content: Text('Please wait while we process your payment.'),
+              );
+            },
+          );
+        });
+        // processPayment(context); // Triggering the payment process
                   }
                 },
           child: const Text('Make Payment',

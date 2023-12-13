@@ -5,7 +5,6 @@ import 'package:school_fees_ease/services/user_service.dart';
 
 import '../core/state.dart';
 import '../screens/homepage.dart';
-import '../screens/onboarding_screen.dart';
 
 final userProvider =
     StateNotifierProvider<_UserNotifier, AppState<UserModel>>((ref) {

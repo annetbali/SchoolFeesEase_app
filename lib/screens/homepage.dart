@@ -80,24 +80,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 );
               },
             ),
-            // ListTile(
-            //   leading: const Icon(Icons.person),
-            //   title: const Text('Account'),
-            //   onTap: () {
-            //     Navigator.pop(context); // Close the drawer
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => const UserAccountPage(
-            //           userName: 'christine', // Replace with actual user data
-            //           userEmail:
-            //               'christinenalubwama4@gmail.com', // Replace with actual user data
-            //         ),
-            //       ),
-            //     );
-            //     // Navigate to the account page
-            //   },
-            // ),
             ListTile(
               leading: const Icon(Icons.school),
               title: const Text(
@@ -236,10 +218,10 @@ class _HomePageState extends ConsumerState<HomePage> {
         margin: const EdgeInsets.all(16.0),
         color: _showCloseButton
             ? Colors.lightBlue[200]
-            : Colors.white, // Alternate colors
+            : Colors.orange, // Alternate colors
         surfaceTintColor: _showCloseButton
             ? Colors.lightBlue[200]
-            : Colors.white, // Alternate colors
+            : Colors.orange, // Alternate colors
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -277,19 +259,4 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 }
-
-// class PaymentMethodsPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Payment Methods'),
-//       ),
-//       body: Center(
-//         child: Text('Payment Methods Page'),
-//       ),
-//     );
-//   }
-// }
-
 

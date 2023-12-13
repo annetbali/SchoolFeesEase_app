@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:school_fees_ease/utils/helpers.dart';
-
 import '../Controllers/Students_controller.dart';
 import '../core/state.dart';
 import '../models/Student_model.dart';
@@ -130,8 +129,7 @@ class AddStudentPage extends ConsumerStatefulWidget {
 class _AddStudentPageState extends ConsumerState<AddStudentPage> {
   final TextEditingController classController = TextEditingController();
 
-  final TextEditingController bankAccountNumberController =
-      TextEditingController();
+  final TextEditingController bankAccountNumberController = TextEditingController();
 
   final TextEditingController nameController = TextEditingController();
 
@@ -229,18 +227,12 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
                           ? null
                           : () {
                               if (_formKey.currentState!.validate()) {
-                                // signUp(
-                                //   classController.text,
-                                //   bankAccountNumberController.text,
-                                //   nameController.text,
-                                //   addressController.text,
-                                // );
                                 ref
                                     .read(studentCRUDProvider.notifier)
                                     .addStudent(
                                         name: nameController.text,
                                         address: addressController.text,
-                                        level: classController.text);
+                                        level: classController.text,);
                               }
                             },
                       child: const Text('Add Student',

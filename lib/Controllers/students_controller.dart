@@ -47,8 +47,8 @@ class _StudentCRUDNotifier extends StateNotifier<AppState<String>> {
 
   addStudent({
     required String name,
-    required String address,
-    required String level,
+    required String level, 
+    required String address
   }) async {
     state = state.copyWith(status: Status.loading);
     var data = await StudentsService.addStudent(
