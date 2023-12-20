@@ -4,8 +4,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:school_fees_ease/utils/colors.dart';
 
 import '../Controllers/schools_controller.dart';
+import '../Controllers/user_controller.dart';
 import '../core/state.dart';
 import '../models/school_model.dart';
+import '../models/user_model.dart';
 import 'widgets/app_button_widget.dart';
 import 'widgets/text_field_widget.dart';
 
@@ -15,23 +17,12 @@ class SchoolListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allSchoolsState = ref.watch(allSchoolsProvider);
-    final schoolCRUDState = ref.watch(schoolCRUDProvider);
-    ref.listen(schoolCRUDProvider, (previous, next) async {
-      if (next.status == Status.loaded) {
-        ref.invalidate(allSchoolsProvider);
-      }
-      if (next.status == Status.error) {
-        Fluttertoast.cancel();
-        Fluttertoast.showToast(
-            msg: next.message ?? 'An error occurred !', timeInSecForIosWeb: 6);
-      }
-    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Schools in Uganda'),
         actions: [
-          allSchoolsState.status == Status.loading ||
-                  schoolCRUDState.status == Status.loading
+          allSchoolsState.status == Status.loading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -45,26 +36,27 @@ class SchoolListPage extends ConsumerWidget {
               : Container()
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: primaryColor,
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const AddSchoolPage()));
-          },
-          label: const Text('Add School', style: TextStyle(color: whiteColor)),
-          icon: const Icon(Icons.add, color: whiteColor)),
+      // floatingActionButton: FloatingActionButton.extended(
+      //     backgroundColor: primaryColor,
+      //     onPressed: () {
+      //       Navigator.of(context).push(
+      //           MaterialPageRoute(builder: (context) => const AddSchoolPage()));
+      //     },
+      //     label: const Text('Add School', style: TextStyle(color: whiteColor)),
+      //     icon: const Icon(Icons.add, color: whiteColor)),
       body: ListView.builder(
         itemCount: allSchoolsState.data!.length,
         itemBuilder: (context, index) {
           final school = allSchoolsState.data![index];
           return ListTile(
-            trailing: IconButton(
+            trailing: (ref.watch(userProvider).data!.userRole !=
+                    UserRole.parent) ?IconButton(
                 onPressed: () {
                   ref
                       .read(schoolCRUDProvider.notifier)
                       .deleteSchool(id: school.id);
                 },
-                icon: const Icon(Icons.delete, color: Colors.red)),
+                icon: const Icon(Icons.delete, color: Colors.red)):null,
             title: Text(school.name),
             subtitle: Text(school.address, maxLines: 1),
             onTap: () {
@@ -145,7 +137,17 @@ class _AddSchoolPageState extends ConsumerState<AddSchoolPage> {
   @override
   Widget build(BuildContext context) {
     final schoolCRUDState = ref.watch(schoolCRUDProvider);
-
+    ref.listen(schoolCRUDProvider, (previous, next) async {
+      if (next.status == Status.loaded) {
+        ref.invalidate(allSchoolsProvider);
+        Navigator.of(context).pop();
+      }
+      if (next.status == Status.error) {
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: next.message ?? 'An error occurred !', timeInSecForIosWeb: 6);
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add School'),

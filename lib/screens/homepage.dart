@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:school_fees_ease/Controllers/user_controller.dart';
 import 'package:school_fees_ease/main.dart';
+import 'package:school_fees_ease/models/user_model.dart';
 import 'package:school_fees_ease/screens/help_page.dart';
 import 'package:school_fees_ease/screens/splash_screen.dart';
 
@@ -11,6 +12,7 @@ import 'PaymentMethodsPage.dart';
 import 'ViewReceiptsPage.dart';
 import 'schools.dart';
 import 'students.dart';
+import 'users.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -208,8 +210,20 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: GridView.count(
               crossAxisCount: 2,
               children: <Widget>[
-                _buildCategoryCard(
-                    'Pay \nFees', Icons.payment, const PayFeesPage()),
+                if (ref.watch(userProvider).data!.userRole ==
+                    UserRole.superAdmin)
+                  _buildCategoryCard('Manage \nUsers', Icons.person_2_outlined,
+                      const UserListPage()),
+                if (ref.watch(userProvider).data!.userRole ==
+                        UserRole.superAdmin ||
+                    ref.watch(userProvider).data!.userRole ==
+                        UserRole.shoolAdmin)
+                  _buildCategoryCard('Add \nSchool', Icons.school_outlined,
+                      const AddSchoolPage()),
+                if (ref.watch(userProvider).data!.userRole !=
+                    UserRole.shoolAdmin)
+                  _buildCategoryCard(
+                      'Pay \nFees', Icons.payment, const PayFeesPage()),
                 _buildCategoryCard(
                     'View \nReceipts', Icons.receipt, const ViewReceiptsPage()),
                 _buildCategoryCard(

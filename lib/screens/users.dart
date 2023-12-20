@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:school_fees_ease/utils/helpers.dart';
+import 'package:school_fees_ease/utils/colors.dart';
 
-import '../Controllers/Students_controller.dart';
+import '../Controllers/schools_controller.dart';
 import '../Controllers/user_controller.dart';
 import '../core/state.dart';
-import '../models/Student_model.dart';
 import '../models/user_model.dart';
-import '../utils/colors.dart';
 import 'widgets/app_button_widget.dart';
 import 'widgets/text_field_widget.dart';
 
-class StudentListPage extends ConsumerWidget {
-  const StudentListPage({super.key});
+class UserListPage extends ConsumerWidget {
+  const UserListPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allStudentsState = ref.watch(allStudentsProvider);
-    final studentCRUDState = ref.watch(studentCRUDProvider);
-    ref.listen(studentCRUDProvider, (previous, next) async {
+    final allUsersState = ref.watch(allUsersProvider);
+    final updateUserState = ref.watch(updateUserProvider);
+    ref.listen(updateUserProvider, (previous, next) async {
       if (next.status == Status.loaded) {
-        ref.invalidate(allStudentsProvider);
+        Navigator.of(context).pop();
+        ref.invalidate(allUsersProvider);
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: next.data ?? 'User updated', timeInSecForIosWeb: 6);
       }
       if (next.status == Status.error) {
         Fluttertoast.cancel();
@@ -31,10 +33,10 @@ class StudentListPage extends ConsumerWidget {
     });
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Students'),
+        title: const Text('Users'),
         actions: [
-          allStudentsState.status == Status.loading ||
-                  studentCRUDState.status == Status.loading
+          allUsersState.status == Status.loading ||
+                  updateUserState.status == Status.loading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -48,37 +50,28 @@ class StudentListPage extends ConsumerWidget {
               : Container()
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: primaryColor,
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const AddStudentPage()));
-          },
-          label: const Text('Add Student', style: TextStyle(color: whiteColor)),
-          icon: const Icon(Icons.add, color: whiteColor)),
       body: ListView.builder(
-        itemCount: allStudentsState.data!.length,
+        itemCount: allUsersState.data!.length,
         itemBuilder: (context, index) {
-          final student = allStudentsState.data![index];
+          final user = allUsersState.data![index];
           return ListTile(
-            trailing:
-                (ref.watch(userProvider).data!.userRole != UserRole.parent)
-                    ? IconButton(
-                        onPressed: () {
-                          ref
-                              .read(studentCRUDProvider.notifier)
-                              .deleteStudent(id: student.id);
-                        },
-                        icon: const Icon(Icons.delete, color: Colors.red))
-                    : null,
-            title: Text(student.name),
-            subtitle: Text(student.address, maxLines: 1),
+            // trailing: IconButton(
+            //     onPressed: () {
+            //       ref
+            //           .read(schoolCRUDProvider.notifier)
+            //           .deleteSchool(id: user.id);
+            //     },
+            //     icon: const Icon(Icons.delete, color: Colors.red)),
+            isThreeLine: true,
+            title: Text(user.name),
+            subtitle:
+                Text('${user.email} (${user.userRole.name})', maxLines: 1),
             onTap: () {
               // Navigate to a new page showing account details
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => StudentDetailsPage(student: student),
+                  builder: (context) => UserDetailsPage(user: user),
                 ),
               );
             },
@@ -89,35 +82,41 @@ class StudentListPage extends ConsumerWidget {
   }
 }
 
-class StudentDetailsPage extends StatelessWidget {
-  final StudentModel student;
+class UserDetailsPage extends ConsumerWidget {
+  final UserModel user;
 
-  const StudentDetailsPage({super.key, required this.student});
+  const UserDetailsPage({super.key, required this.user});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(student.name),
+        title: Text(user.name),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Level: ${student.level}'),
+            Text('ID: ${user.id}'),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: Text('Student Number ${student.id}')),
-                // const Spacer(),
-                InkWell(
-                    onTap: () => Helpers.copyToClipboard(context, student.id),
-                    child: const Icon(Icons.copy))
-              ],
+            Text('Email: ${user.email}'),
+            const SizedBox(height: 10),
+            Text('Phone: ${user.contact}'),
+            const SizedBox(height: 20),
+            DropDownWidget(
+              onChanged: (value) {
+                ref
+                    .read(updateUserProvider.notifier)
+                    .updateUser(user.copyWith(userRole: value));
+              },
+              value: user.userRole,
+              items: UserRole.values
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
+                  .toList(),
+              // prefixIcon: const Icon(Icons.money_rounded),
             ),
-            const SizedBox(height: 10),
-            Text('Address: ${student.address}'),
+            // Text('Role: ${user.userRole.name}'),
           ],
         ),
       ),
@@ -125,15 +124,15 @@ class StudentDetailsPage extends StatelessWidget {
   }
 }
 
-class AddStudentPage extends ConsumerStatefulWidget {
-  const AddStudentPage({super.key});
+class UpdateUserPage extends ConsumerStatefulWidget {
+  const UpdateUserPage({super.key});
 
   @override
-  ConsumerState<AddStudentPage> createState() => _AddStudentPageState();
+  ConsumerState<UpdateUserPage> createState() => _AddSchoolPageState();
 }
 
-class _AddStudentPageState extends ConsumerState<AddStudentPage> {
-  final TextEditingController classController = TextEditingController();
+class _AddSchoolPageState extends ConsumerState<UpdateUserPage> {
+  final TextEditingController bankNameController = TextEditingController();
 
   final TextEditingController bankAccountNumberController =
       TextEditingController();
@@ -146,7 +145,7 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    classController.dispose();
+    bankNameController.dispose();
     bankAccountNumberController.dispose();
     nameController.dispose();
     addressController.dispose();
@@ -158,13 +157,13 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final studentCRUDState = ref.watch(studentCRUDProvider);
+    final schoolCRUDState = ref.watch(schoolCRUDProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Student'),
+        title: const Text('Add User'),
         actions: [
-          studentCRUDState.status == Status.loading
+          schoolCRUDState.status == Status.loading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -194,19 +193,19 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
                 children: <Widget>[
                   TextFieldWidget(
                     controller: nameController,
-                    label: 'Student Name',
+                    label: 'Name',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please Student name';
+                        return 'Please user name';
                       }
                       return null;
                     },
-                    prefixIcon: const Icon(Icons.school),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   const SizedBox(height: 16.0),
                   TextFieldWidget(
                     controller: addressController,
-                    label: 'Student Address',
+                    label: 'Address',
                     prefixIcon: const Icon(Icons.location_city),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -217,12 +216,24 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
                   ),
                   const SizedBox(height: 16.0),
                   TextFieldWidget(
-                    controller: classController,
-                    label: 'Student Class',
+                    controller: bankNameController,
+                    label: 'Bank Name',
                     prefixIcon: const Icon(Icons.account_balance_sharp),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter student class';
+                        return 'Please enter bank name';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextFieldWidget(
+                    controller: bankAccountNumberController,
+                    label: 'bank Account Number',
+                    prefixIcon: const Icon(Icons.money_rounded),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter back account name';
                       }
                       return null;
                     },
@@ -230,25 +241,25 @@ class _AddStudentPageState extends ConsumerState<AddStudentPage> {
                   const SizedBox(height: 24.0),
                   AppButtonWidget(
                       borderRadius: 15,
-                      onTap: studentCRUDState.status == Status.loading
+                      onTap: schoolCRUDState.status == Status.loading
                           ? null
                           : () {
                               if (_formKey.currentState!.validate()) {
                                 // signUp(
-                                //   classController.text,
+                                //   bankNameController.text,
                                 //   bankAccountNumberController.text,
                                 //   nameController.text,
                                 //   addressController.text,
                                 // );
-                                ref
-                                    .read(studentCRUDProvider.notifier)
-                                    .addStudent(
-                                        name: nameController.text,
-                                        address: addressController.text,
-                                        level: classController.text);
+                                ref.read(schoolCRUDProvider.notifier).addSchool(
+                                    name: nameController.text,
+                                    address: addressController.text,
+                                    bankName: bankNameController.text,
+                                    accountNumber:
+                                        bankAccountNumberController.text);
                               }
                             },
-                      child: const Text('Add Student',
+                      child: const Text('Add User',
                           style: TextStyle(color: whiteColor))),
                   const SizedBox(
                     height: 20,

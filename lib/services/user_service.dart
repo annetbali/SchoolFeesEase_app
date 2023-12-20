@@ -70,6 +70,7 @@ class UserService {
           UserModel(
                   id: userCredentials.user!.uid,
                   name: username,
+                  userRole: UserRole.parent,
                   contact: contact,
                   email: email)
               .toMap());
@@ -77,7 +78,42 @@ class UserService {
           id: userCredentials.user!.uid,
           name: username,
           contact: contact,
+          userRole: UserRole.parent,
           email: email));
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? e.toString());
+    } on FirebaseException catch (e) {
+      return Left(e.message ?? e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  static Future<Either<String, String>> updateUser(
+      {required UserModel userModel}) async {
+    try {
+      await fireStore
+          .collection('Users')
+          .doc(userModel.id)
+          .update(userModel.toMap());
+      return const Right('User updated successfully!!!');
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? e.toString());
+    } on FirebaseException catch (e) {
+      return Left(e.message ?? e.toString());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  static Future<Either<String, List<UserModel>>> allUser() async {
+    try {
+      List<UserModel> users = [];
+      var response = await fireStore.collection('Users').get();
+      for (var element in response.docs) {
+        users.add(UserModel.fromMap(element.data()));
+      }
+      return Right(users);
     } on FirebaseAuthException catch (e) {
       return Left(e.message ?? e.toString());
     } on FirebaseException catch (e) {
