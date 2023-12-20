@@ -16,7 +16,7 @@ UserRole _stringToEnum(String input) {
     case 'superAdmin':
       return UserRole.superAdmin;
     default:
-      throw ArgumentError('Invalid value: $input');
+      return UserRole.parent;
   }
 }
 
@@ -62,10 +62,10 @@ class UserModel {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      contact: map['contact'] as String,
-      email: map['email'] as String,
+      id: map['id'].toString(),
+      name: map['name'].toString(),
+      contact: map['contact'].toString(),
+      email: map['email'].toString(),
       userRole: _stringToEnum(map['userRole'] ?? 'parent'),
     );
   }

@@ -117,8 +117,11 @@ class UserService {
     } on FirebaseAuthException catch (e) {
       return Left(e.message ?? e.toString());
     } on FirebaseException catch (e) {
+      print(e);
       return Left(e.message ?? e.toString());
-    } catch (e) {
+    } catch (e, stack) {
+      print(e);
+      print(stack);
       return Left(e.toString());
     }
   }
